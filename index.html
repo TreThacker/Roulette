@@ -1,0 +1,345 @@
+<!--
+Ultimate Roulette
+by: Tre Thacker - 2026
+Version: 1.10
+Status: Release
+
+Version Notes:
+- Version 1.10 Several fixes, adds chat and leaderboard panels
+- Version 1.00 is the first finalized private release build.
+- Version 1.00 date 5.23.26
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultimate Roulette</title>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<h1 id="game-title">
+    <span class="title-green">U</span>
+    <span class="title-blue">L</span>
+    <span class="title-green">T</span>
+    <span class="title-blue">I</span>
+    <span class="title-green">M</span>
+    <span class="title-blue">A</span>
+    <span class="title-green">T</span>
+    <span class="title-blue">E</span>
+
+    <span class="title-gap"></span>
+
+    <span class="title-blue">R</span>
+    <span class="title-green">O</span>
+    <span class="title-blue">U</span>
+    <span class="title-green">L</span>
+    <span class="title-blue">E</span>
+    <span class="title-green">T</span>
+    <span class="title-blue">T</span>
+    <span class="title-green">E</span>
+</h1>
+
+<div id="cyber-dashboard">
+
+    <div class="hud-panel" id="panel-history">
+        <div id="history-title">Spin History:</div>
+        <div id="spin-history"></div>
+        <div id="history-buttons">
+			<button id="help-btn">?</button>
+
+			<button id="options-btn">
+				⚙
+			</button>
+		</div>
+   
+		<div id="creator-credit">
+			Tre Thacker (@ttrever) 2026
+		</div>
+		<div id="version-display"></div>
+		
+    </div>
+
+    <div class="hud-panel" id="panel-left">
+        <div id="win-number-display">-</div>
+
+        <div id="wheel-housing">
+            <div id="pointer"></div>
+            <canvas id="wheel-canvas" width="500" height="500"></canvas>
+            <div id="ball"></div>
+
+            <div id="wheel-center-logo">
+                <img src="image/handle/needle_handle.webp">
+            </div>
+        </div>
+
+        <div id="account-bar">
+            <div class="stat-capsule">Bank: <strong id="balance">5000</strong></div>
+            <div class="stat-capsule">Current Bet: <strong id="total-bet-display">0</strong></div>
+        </div>
+
+        <div id="system-log">Place your bets, players. The table is open.</div>
+    </div>
+
+    <div class="hud-panel" id="panel-right">
+        <div id="table-area">
+            <div id="table-wrapper">
+                <div id="betting-table">
+                    <div class="cell zero cell-0" data-bet-type="number" data-value="0">0</div>
+
+                    <div class="cell outside doz-1st" data-bet-type="dozen" data-value="1">1st 12</div>
+                    <div class="cell outside doz-2nd" data-bet-type="dozen" data-value="2">2nd 12</div>
+                    <div class="cell outside doz-3rd" data-bet-type="dozen" data-value="3">3rd 12</div>
+
+                    <div class="cell outside low-1-18" data-bet-type="lowhigh" data-value="low">1-18</div>
+                    <div class="cell outside even-bet" data-bet-type="evenodd" data-value="even">Even</div>
+                    <div class="cell outside red-bet" data-bet-type="color" data-value="green">Green</div>
+					<div class="cell outside black-bet" data-bet-type="color" data-value="blue">Blue</div>
+                    <div class="cell outside odd-bet" data-bet-type="evenodd" data-value="odd">Odd</div>
+                    <div class="cell outside high-19-36" data-bet-type="lowhigh" data-value="high">19-36</div>
+
+                    <div class="repeat-bet-cell" id="repeat-bet-btn">REPEAT</div>
+					<div class="cell col-1st" data-bet-type="column" data-value="1">2:1</div>
+					<div class="cell col-2nd" data-bet-type="column" data-value="2">2:1</div>
+					<div class="cell col-3rd" data-bet-type="column" data-value="3">2:1</div>
+                </div>
+            </div>
+
+            <div class="chip-selector">
+                <div class="chip-node selected" data-value="10">10</div>
+                <div class="chip-node" data-value="50">50</div>
+                <div class="chip-node" data-value="100">100</div>
+                <div class="chip-node" data-value="500">500</div>
+                <div class="chip-node" data-value="1000">1000</div>
+				<div class="chip-node" data-value="5000">5000</div>
+				<div class="chip-node" data-value="10000">10K</div>
+				<div class="chip-node" data-value="50000">50K</div>
+				<div class="chip-node chip-rainbow" data-value="100000">100K</div>
+            </div>
+        </div>
+
+        <div class="action-cluster">
+            <button class="hud-btn" id="clear-btn">CLEAR</button>
+            <button class="hud-btn" id="spin-btn">SPIN</button>
+        </div>
+    </div>
+
+    <div class="hud-panel" id="panel-bets">
+    <div id="bet-slip-title-row">
+        <button id="bet-history-btn">💰</button>
+        <div id="bet-slip-title">Bet Slip</div>
+    </div>
+
+        <div id="bet-slip-header">
+            <span>Bet</span>
+            <span>Stake</span>
+            <span>Pays</span>
+        </div>
+
+        <div id="bet-slip"></div>
+
+        <div id="bet-slip-total">
+            <div>Total:</div>
+            <div id="bet-slip-total-payout">0</div>
+        </div>
+    </div>
+
+</div>
+
+<div id="help-modal" class="modal-hidden">
+    <div id="help-modal-content">
+        <button id="help-close-btn">✕</button>
+        <h2>Bets Explained:</h2>
+
+        <p><strong>Straight Number Bet</strong><br>
+        Place your chip directly on one number on the main betting grid. This covers only that exact number. Pays 36:1.<br>
+        Example: 10 chips on #17 pays 360 chips if 17 hits.</p>
+
+        <p><strong>Split Bet</strong><br>
+        Place your chip on the line between two touching numbers. This covers both numbers. Pays 18:1.<br>
+        Example: 10 chips on a 17/18 split pays 180 chips if either 17 or 18 hits.</p>
+
+        <p><strong>Corner Bet</strong><br>
+        Place your chip where four numbers meet at an intersection. This covers all four numbers. Pays 9:1.<br>
+        Example: 10 chips on 1/2/4/5 pays 90 chips if any of those four numbers hit.</p>
+
+        <p><strong>Red Bet</strong><br>
+        Place your chip on the Red side bet on the left side of the grid. This covers all green-colored numbers. Pays 2:1.<br>
+        Example: 10 chips on Red pays 20 chips if a green number hits.</p>
+
+        <p><strong>Black Bet</strong><br>
+        Place your chip on the Black side bet on the left side of the grid. This covers all blue-colored numbers. Pays 2:1.<br>
+        Example: 10 chips on Black pays 20 chips if a blue number hits.</p>
+
+        <p><strong>Odd / Even Bet</strong><br>
+        Place your chip on Odd or Even on the left side of the grid. Zero does not count as odd or even. Pays 2:1.<br>
+        Example: 10 chips on Even pays 20 chips if any even number from 2 through 36 hits.</p>
+
+        <p><strong>Low / High Bet</strong><br>
+        Place your chip on 1-18 for low numbers or 19-36 for high numbers. Zero does not count. Pays 2:1.<br>
+        Example: 10 chips on 1-18 pays 20 chips if any number from 1 through 18 hits.</p>
+
+        <p><strong>Dozen Bet</strong><br>
+        Place your chip on 1st 12, 2nd 12, or 3rd 12. 1st 12 covers 1-12, 2nd 12 covers 13-24, and 3rd 12 covers 25-36. Pays 3:1.<br>
+        Example: 10 chips on 2nd 12 pays 30 chips if any number from 13 through 24 hits.</p>
+
+        <p><strong>Column Bet</strong><br>
+        Place your chip on one of the 2:1 boxes at the bottom of the number columns. This covers all numbers in that vertical column. Pays 3:1.<br>
+        Example: 10 chips on a column bet pays 30 chips if any number in that column hits.</p>
+    </div>
+</div>
+
+<div id="options-modal" class="modal-hidden">
+    <div id="options-modal-content">
+
+        <button id="options-close-btn">✕</button>
+
+        <h2>Game Options:</h2>
+
+        <div class="option-row">
+			<span>Sound Effects</span>
+			<button class="option-toggle option-on" id="sound-toggle-btn">ON</button>
+		</div>
+
+        <div class="option-row">
+            <span>Dealer Voice</span>
+            <button class="option-toggle">COMING SOON</button>
+        </div>
+
+        <div class="option-row">
+			<span>Turbo Spin Mode</span>
+			<button class="option-toggle option-off" id="turbo-toggle-btn">OFF</button>
+		</div>
+	
+		<div class="option-row">
+			<span>Spinning Logo</span>
+			<button class="option-toggle option-on" id="spinning-logo-toggle-btn" >ON</button>
+</div>
+
+        <div class="option-row">
+			<span>Board Theme</span>
+			<button class="option-toggle option-on" id="theme-toggle-btn">CYBER</button>
+</div>
+		
+	<div class="option-row">
+		<span>Custom Wheel Center</span>
+		<button class="option-toggle" id="custom-wheel-center-btn">COMING SOON</button>
+	</div>
+
+	<div class="option-row">
+		<span>Custom Ball</span>
+		<button class="option-toggle" id="custom-ball-btn">COMING SOON</button>
+	</div>
+    </div>
+</div>
+
+<div id="welcome-modal">
+    <div id="welcome-modal-content">
+        <h2>Welcome to Ultimate Roulette !!!</h2>
+
+        <p>
+            Step up to the table, place your bets, and see where the wheel lands.
+        </p>
+
+        <button id="lets-play-btn">Let's Play !!!</button>
+    </div>
+</div>
+
+<div id="bet-history-modal" class="modal-hidden">
+    <div id="bet-history-modal-content">
+        <button id="bet-history-close-btn">✕</button>
+
+        <h2>Bet History</h2>
+
+        <div id="bet-history-stats">
+            <div>Total Spins: <strong id="lifetime-spin-count">0</strong></div>
+            <div>Lifetime Net: <strong id="lifetime-net-total">0</strong></div>
+        </div>
+
+        <div id="bet-history-divider"></div>
+
+        <div id="bet-history-list"></div>
+    </div>
+</div>
+
+<div id="clear-history-confirm-modal" class="modal-hidden">
+    <div id="clear-history-confirm-content">
+
+        <h2>WARNING</h2>
+
+        <p>
+            ARE YOU SURE?<br><br>
+            THIS IS IRREVERSIBLE!
+        </p>
+
+        <div id="clear-history-confirm-buttons">
+
+            <button id="confirm-clear-history-btn">
+                Yes. Clear History.
+            </button>
+
+            <button id="cancel-clear-history-btn">
+                No. Save History.
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<div id="admin-modal" class="modal-hidden">
+    <div id="admin-modal-content">
+
+        <button id="admin-close-btn">✕</button>
+
+        <h2>ADMIN CONSOLE</h2>
+
+        <div class="admin-row">
+            <span>Bank Controls</span>
+            <div class="admin-button-group">
+                <button class="admin-btn" data-bank-change="1000">+1,000</button>
+                <button class="admin-btn" data-bank-change="10000">+10,000</button>
+				<button class="admin-btn" data-bank-change="1000000">+1,000,000</button>
+                <button class="admin-btn" data-bank-change="-1000">-1,000</button>
+                <button class="admin-btn" id="admin-reset-bank">Reset</button>
+            </div>
+        </div>
+
+        <div class="admin-row">
+            <span>Force Next Spin</span>
+            <div class="admin-button-group">
+                <input id="force-number-input" type="number" min="0" max="36" placeholder="0-36">
+                <button class="admin-btn" id="force-number-btn">Set</button>
+                <button class="admin-btn" id="clear-force-btn">Clear</button>
+            </div>
+        </div>
+
+        <div class="admin-row">
+            <span>Infinite Chips</span>
+            <button class="admin-btn" id="infinite-bank-btn">OFF</button>
+        </div>
+
+        <div class="admin-row">
+            <span>Unlock All Cosmetics</span>
+            <button class="admin-btn" id="unlock-cosmetics-btn">Unlock</button>
+        </div>
+		
+		<div class="admin-row">
+			<span>Bet History Controls</span>
+			<button class="admin-btn" id="admin-clear-history-btn">Clear Bet History</button>
+</div>
+
+        <div id="admin-status">Admin console ready.</div>
+
+    </div>
+</div>
+
+<script src="app.js" defer></script>
+
+
+</body>
+</html>
