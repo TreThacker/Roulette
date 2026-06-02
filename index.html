@@ -5,7 +5,7 @@ Version: 1.10
 Status: Release
 
 Version Notes:
-- Version 1.10 Several fixes, adds chat and leaderboard panels
+- Version 1.10 Several fixes, adds Chat and leaderboard panels
 - Version 1.00 is the first finalized private release build.
 - Version 1.00 date 5.23.26
 -->
@@ -146,6 +146,76 @@ Version Notes:
         <div id="bet-slip-total">
             <div>Total:</div>
             <div id="bet-slip-total-payout">0</div>
+        </div>
+    </div>
+
+<!-- <------------------------------------------------
+			CHAT PANEL PLACEHOLDER
+		 ------------------------------------------------->
+    <div class="hud-panel" id="panel-chat">
+        <div id="chat-title-row">
+            <button id="chat-users-toggle-btn">☰</button>
+            <div id="chat-title">Chat</div>
+        </div>
+
+        <div id="chat-body">
+            <div id="chat-user-slideout" class="chat-slideout-hidden">
+                <div id="chat-users-title">Players</div>
+
+                <button class="chat-user-btn" data-player-name="Player 1">Player 1</button>
+                <button class="chat-user-btn" data-player-name="Player 2">Player 2</button>
+                <button class="chat-user-btn" data-player-name="Player 3">Player 3</button>
+            </div>
+
+            <div id="chat-messages">
+                <div class="chat-placeholder-message">
+                    Chat system coming soon.
+                </div>
+            </div>
+        </div>
+
+        <div id="chat-input-row">
+            <input id="chat-input" type="text" placeholder="Chat coming soon..." disabled>
+            <button id="chat-send-btn" disabled>Send</button>
+        </div>
+    </div>
+
+<!-- <------------------------------------------------
+			LEADERBOARD PANEL PLACEHOLDER
+		 ------------------------------------------------->
+    <div class="hud-panel" id="panel-leaderboard">
+        <div id="leaderboard-title">Leaderboard</div>
+
+        <div id="leaderboard-list">
+            <div class="leaderboard-row">
+                <span>1.</span>
+                <span>---</span>
+                <span>0</span>
+            </div>
+
+            <div class="leaderboard-row">
+                <span>2.</span>
+                <span>---</span>
+                <span>0</span>
+            </div>
+
+            <div class="leaderboard-row">
+                <span>3.</span>
+                <span>---</span>
+                <span>0</span>
+            </div>
+
+            <div class="leaderboard-row">
+                <span>4.</span>
+                <span>---</span>
+                <span>0</span>
+            </div>
+
+            <div class="leaderboard-row">
+                <span>5.</span>
+                <span>---</span>
+                <span>0</span>
+            </div>
         </div>
     </div>
 
@@ -333,10 +403,23 @@ Version Notes:
 			<button class="admin-btn" id="admin-clear-history-btn">Clear Bet History</button>
 </div>
 
-        <div id="admin-status">Admin console ready.</div>
+<!-- <------------------------------------------------
+			ADMIN CHAT AND LEADERBOARD CONTROLS
+		 ------------------------------------------------->
+		<div class="admin-row">
+			<span>Chat Controls</span>
+			<button class="admin-btn" id="admin-clear-chat-btn">Clear Chat History</button>
+		</div>
+
+		<div class="admin-row">
+			<span>Leaderboard Controls</span>
+			<button class="admin-btn" id="admin-clear-leaderboard-btn">Clear Leaderboard</button>
+		</div>
+
+    <div id="admin-status">Admin console ready.</div>
 
     </div>
-</div>
+</div> 
 
 <script src="app.js" defer></script>
 

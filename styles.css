@@ -13,6 +13,7 @@ body {
     align-items: center;
     user-select: none;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 #game-title {
@@ -25,6 +26,10 @@ body {
     text-shadow: 0 0 8px #39ff14, 0 0 18px #39ff14, 0 0 35px #39ff14;
     margin: 0 0 30px 0;
     text-transform: uppercase;
+    white-space: nowrap;
+    --title-auto-scale: 1;
+    transform: scale(var(--title-auto-scale, 1));
+    transform-origin: center center;    white-space: nowrap;
 }
 
 .title-green {
@@ -50,11 +55,15 @@ body {
     width: 28px;
 }
 
+ /* <------------------------------------------------
+      MAIN DASHBOARD LAYOUT WITH CHAT AND LEADERBOARD
+   -------------------------------------------------> */
 #cyber-dashboard {
     display: grid;
-    grid-template-columns: 150px 530px 400px 230px;
-    gap: 25px;
-    max-width: 1380px;
+    grid-template-columns: 150px 530px 400px 230px 240px;
+    grid-template-rows: minmax(205px, auto) minmax(435px, auto);
+    gap: 20px;
+    max-width: 1620px;
     width: 100%;
 }
 
@@ -94,13 +103,426 @@ body {
     transform: translateX(-50%);
 }
 
-#panel-history { grid-column: 1; }
-#panel-left { grid-column: 2; }
-#panel-right { grid-column: 3; }
+ /* <------------------------------------------------
+      MAIN PANEL GRID PLACEMENT
+   -------------------------------------------------> */
+#panel-history {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+#panel-left {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+}
+
+#panel-right {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+}
+
 #panel-bets {
     grid-column: 4;
+    grid-row: 1 / span 2;
     align-items: stretch;
     padding: 16px;
+}
+
+#panel-leaderboard {
+    grid-column: 5;
+    grid-row: 1;
+    align-items: stretch;
+    padding: 14px 16px;
+    min-height: 205px;
+}
+
+#panel-chat {
+    grid-column: 5;
+    grid-row: 2;
+    align-items: stretch;
+    padding: 16px;
+    min-height: 435px;
+}
+
+ /* <------------------------------------------------
+      CHAT PANEL PLACEHOLDER STYLES
+   -------------------------------------------------> */
+#chat-title-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+#chat-title {
+    color: #39ff14;
+    text-align: center;
+    font-size: 1rem;
+    text-shadow: 0 0 8px #39ff14;
+    letter-spacing: 1px;
+}
+
+#chat-users-toggle-btn {
+    position: absolute;
+    left: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid #50dcff;
+    background: #000;
+    color: #50dcff;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow:
+        0 0 12px #50dcff,
+        inset 0 0 8px rgba(80,220,255,0.35);
+}
+
+#chat-body {
+    position: relative;
+    flex: 1;
+    min-height: 210px;
+    overflow: hidden;
+    border: 1px solid rgba(57,255,20,0.22);
+    border-radius: 12px;
+    background: rgba(0,0,0,0.32);
+}
+
+#chat-messages {
+    height: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.chat-placeholder-message {
+    color: #a3f7bf;
+    font-size: 0.82rem;
+    text-align: center;
+    opacity: 0.8;
+}
+
+#chat-user-slideout {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 135px;
+    height: 100%;
+    z-index: 3;
+    padding: 12px 8px;
+    box-sizing: border-box;
+    background: rgba(0,0,0,0.92);
+    border-right: 1px solid rgba(80,220,255,0.45);
+    box-shadow: 0 0 14px rgba(80,220,255,0.35);
+    transition: transform 0.2s ease;
+}
+
+.chat-slideout-hidden {
+    transform: translateX(-145px);
+}
+
+#chat-users-title {
+    color: #50dcff;
+    font-size: 0.82rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    text-shadow: 0 0 6px #50dcff;
+}
+
+.chat-user-btn {
+    width: 100%;
+    margin-bottom: 8px;
+    padding: 6px;
+    border-radius: 8px;
+    border: 1px solid #39ff14;
+    background: rgba(57,255,20,0.08);
+    color: #39ff14;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#chat-input-row {
+    display: grid;
+    grid-template-columns: 1fr 52px;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+#chat-input {
+    min-width: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(80,220,255,0.45);
+    background: rgba(0,0,0,0.45);
+    color: #a3f7bf;
+    padding: 7px;
+    font-family: inherit;
+    font-size: 0.75rem;
+}
+
+#chat-send-btn {
+    border-radius: 8px;
+    border: 1px solid #50dcff;
+    background: rgba(80,220,255,0.08);
+    color: #50dcff;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: bold;
+}
+
+ /* <------------------------------------------------
+      LEADERBOARD PANEL PLACEHOLDER STYLES
+   -------------------------------------------------> */
+#leaderboard-title {
+    color: #39ff14;
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    text-shadow: 0 0 8px #39ff14;
+    letter-spacing: 1px;
+}
+
+#leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 24px 1fr 90px;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(57,255,20,0.14);
+    color: #a3f7bf;
+    font-size: 0.76rem;
+}
+
+.leaderboard-row span:last-child {
+    color: #ffcf75;
+    text-align: right;
+    justify-self: end;
+    font-variant-numeric: tabular-nums;
+}
+
+/* <------------------------------------------------
+      THEME CHAT AND LEADERBOARD COLORS
+   -------------------------------------------------> */
+body.purple-theme #chat-title,
+body.purple-theme #leaderboard-title,
+body.purple-theme #chat-users-title {
+    color: #c86bff !important;
+    text-shadow: 0 0 8px #c86bff !important;
+}
+
+body.purple-theme .chat-placeholder-message,
+body.purple-theme .leaderboard-row,
+body.purple-theme .leaderboard-row span:last-child {
+    color: #dcb6ff !important;
+}
+
+body.purple-theme .chat-user-btn {
+    border-color: #c86bff !important;
+    background: rgba(200,107,255,0.08) !important;
+    color: #c86bff !important;
+}
+
+body.purple-theme #chat-user-slideout {
+    border-right-color: rgba(200,107,255,0.45) !important;
+    box-shadow: 0 0 14px rgba(200,107,255,0.35) !important;
+}
+
+body.volcanic-theme #chat-title,
+body.volcanic-theme #leaderboard-title,
+body.volcanic-theme #chat-users-title {
+    color: #ff7a00 !important;
+    text-shadow: 0 0 8px #ff7a00 !important;
+}
+
+body.volcanic-theme .chat-placeholder-message,
+body.volcanic-theme .leaderboard-row,
+body.volcanic-theme .leaderboard-row span:last-child {
+    color: #ffd2a1 !important;
+}
+
+body.volcanic-theme .chat-user-btn {
+    border-color: #ff7a00 !important;
+    background: rgba(255,122,0,0.08) !important;
+    color: #ff7a00 !important;
+}
+
+body.volcanic-theme #chat-user-slideout {
+    border-right-color: rgba(255,122,0,0.45) !important;
+    box-shadow: 0 0 14px rgba(255,122,0,0.35) !important;
+}
+
+body.frozen-theme #chat-title,
+body.frozen-theme #leaderboard-title,
+body.frozen-theme #chat-users-title {
+    color: #8ff6ff !important;
+    text-shadow: 0 0 8px #8ff6ff !important;
+}
+
+body.frozen-theme .chat-placeholder-message,
+body.frozen-theme .leaderboard-row,
+body.frozen-theme .leaderboard-row span:last-child {
+    color: #d8fbff !important;
+}
+
+body.frozen-theme .chat-user-btn {
+    border-color: #8ff6ff !important;
+    background: rgba(143,246,255,0.08) !important;
+    color: #8ff6ff !important;
+}
+
+body.frozen-theme #chat-user-slideout {
+    border-right-color: rgba(143,246,255,0.45) !important;
+    box-shadow: 0 0 14px rgba(143,246,255,0.35) !important;
+}
+
+body.royal-theme #chat-title,
+body.royal-theme #leaderboard-title,
+body.royal-theme #chat-users-title {
+    color: #d4af37 !important;
+    text-shadow: 0 0 5px rgba(212,175,55,0.45) !important;
+}
+
+body.royal-theme .chat-placeholder-message,
+body.royal-theme .leaderboard-row,
+body.royal-theme .leaderboard-row span:last-child {
+    color: #f5df9b !important;
+}
+
+body.royal-theme .chat-user-btn {
+    border-color: #b88a2b !important;
+    background: rgba(212,175,55,0.08) !important;
+    color: #d4af37 !important;
+}
+
+body.royal-theme #chat-user-slideout {
+    border-right-color: rgba(184,138,43,0.45) !important;
+    box-shadow: 0 0 14px rgba(184,138,43,0.35) !important;
+}
+
+body.classic-theme #chat-title,
+body.classic-theme #leaderboard-title,
+body.classic-theme #chat-users-title,
+body.classic-theme .chat-placeholder-message,
+body.classic-theme .leaderboard-row,
+body.classic-theme .leaderboard-row span:last-child {
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+body.classic-theme .chat-user-btn {
+    border-color: #ffffff !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    text-shadow: none !important;
+}
+
+body.classic-theme #chat-user-slideout {
+    background: #075c2a !important;
+    border-right-color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+body.vegas-retro-theme #chat-title,
+body.vegas-retro-theme #leaderboard-title,
+body.vegas-retro-theme #chat-users-title {
+    color: #ffcf6b !important;
+    text-shadow: 0 0 8px #ffcf6b !important;
+}
+
+body.vegas-retro-theme .chat-placeholder-message,
+body.vegas-retro-theme .leaderboard-row,
+body.vegas-retro-theme .leaderboard-row span:last-child {
+    color: #ffe9b0 !important;
+}
+
+body.vegas-retro-theme .chat-user-btn {
+    border-color: #ffcf6b !important;
+    background: rgba(255,207,107,0.08) !important;
+    color: #ffcf6b !important;
+}
+
+body.vegas-retro-theme #chat-user-slideout {
+    border-right-color: rgba(255,207,107,0.45) !important;
+    box-shadow: 0 0 14px rgba(255,207,107,0.35) !important;
+}
+
+/* <------------------------------------------------
+      THEME CHAT CONTROLS AND CHAT WINDOW BORDERS
+   -------------------------------------------------> */
+body.volcanic-theme {
+    --theme-chat-main: #ff7a00;
+    --theme-chat-soft: #ffd2a1;
+    --theme-chat-bg: rgba(255,122,0,0.08);
+    --theme-chat-border: rgba(255,122,0,0.45);
+}
+
+body.frozen-theme {
+    --theme-chat-main: #8ff6ff;
+    --theme-chat-soft: #d8fbff;
+    --theme-chat-bg: rgba(143,246,255,0.08);
+    --theme-chat-border: rgba(143,246,255,0.45);
+}
+
+body.royal-theme {
+    --theme-chat-main: #d4af37;
+    --theme-chat-soft: #f5df9b;
+    --theme-chat-bg: rgba(212,175,55,0.08);
+    --theme-chat-border: rgba(184,138,43,0.45);
+}
+
+body.classic-theme {
+    --theme-chat-main: #ffffff;
+    --theme-chat-soft: #ffffff;
+    --theme-chat-bg: transparent;
+    --theme-chat-border: #ffffff;
+}
+
+body.vegas-retro-theme {
+    --theme-chat-main: #ffcf6b;
+    --theme-chat-soft: #ffe9b0;
+    --theme-chat-bg: rgba(255,207,107,0.08);
+    --theme-chat-border: rgba(255,207,107,0.45);
+}
+
+body.volcanic-theme #chat-users-toggle-btn,
+body.frozen-theme #chat-users-toggle-btn,
+body.royal-theme #chat-users-toggle-btn,
+body.classic-theme #chat-users-toggle-btn,
+body.vegas-retro-theme #chat-users-toggle-btn,
+body.volcanic-theme #chat-send-btn,
+body.frozen-theme #chat-send-btn,
+body.royal-theme #chat-send-btn,
+body.classic-theme #chat-send-btn,
+body.vegas-retro-theme #chat-send-btn {
+    background: var(--theme-chat-bg) !important;
+    border-color: var(--theme-chat-main) !important;
+    color: var(--theme-chat-main) !important;
+    box-shadow:
+        0 0 10px var(--theme-chat-border),
+        inset 0 0 8px var(--theme-chat-bg) !important;
+}
+
+body.volcanic-theme #chat-body,
+body.frozen-theme #chat-body,
+body.royal-theme #chat-body,
+body.classic-theme #chat-body,
+body.vegas-retro-theme #chat-body,
+body.volcanic-theme #chat-input,
+body.frozen-theme #chat-input,
+body.royal-theme #chat-input,
+body.classic-theme #chat-input,
+body.vegas-retro-theme #chat-input {
+    border-color: var(--theme-chat-border) !important;
+    color: var(--theme-chat-soft) !important;
 }
 
 #bet-slip-title {
@@ -899,7 +1321,7 @@ body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-the
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.16rem;
     cursor: pointer;
     position: relative;
     color: #a3f7bf;
@@ -933,7 +1355,7 @@ body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-the
 
 .cell.outside {
     background-color: #010502;
-    font-size: 0.75rem;
+    font-size: 0.96rem;
     color: #80c797;
     writing-mode: vertical-lr;
     transform: rotate(180deg);
@@ -946,9 +1368,9 @@ body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-the
 .doz-2nd { grid-column: 2; grid-row: 6 / span 4; }
 .doz-3rd { grid-column: 2; grid-row: 10 / span 4; }
 
-.col-1st { grid-column: 3; grid-row: 14; writing-mode: normal; transform: none; font-size: 0.85rem; }
-.col-2nd { grid-column: 4; grid-row: 14; writing-mode: normal; transform: none; font-size: 0.85rem; }
-.col-3rd { grid-column: 5; grid-row: 14; writing-mode: normal; transform: none; font-size: 0.85rem; }
+.col-1st { grid-column: 3; grid-row: 14; writing-mode: normal; transform: none; font-size: 1.08rem; }
+.col-2nd { grid-column: 4; grid-row: 14; writing-mode: normal; transform: none; font-size: 1.08rem; }
+.col-3rd { grid-column: 5; grid-row: 14; writing-mode: normal; transform: none; font-size: 1.08rem; }
 .repeat-bet-cell {
     grid-column: 1 / span 2;
     grid-row: 14;
@@ -979,6 +1401,120 @@ body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-the
 .black-bet { grid-column: 1; grid-row: 8 / span 2; color: #50dcff; background: rgba(80,220,255,0.08); }
 .odd-bet { grid-column: 1; grid-row: 10 / span 2; }
 .high-19-36 { grid-column: 1; grid-row: 12 / span 2; }
+
+/* <------------------------------------------------
+      THEMED OUTSIDE BET DIAMONDS
+   -------------------------------------------------> */
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .red-bet,
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .black-bet,
+body.purple-theme .red-bet,
+body.purple-theme .black-bet,
+body.volcanic-theme .red-bet,
+body.volcanic-theme .black-bet,
+body.frozen-theme .red-bet,
+body.frozen-theme .black-bet,
+body.royal-theme .red-bet,
+body.royal-theme .black-bet {
+    color: transparent !important;
+    font-size: 0 !important;
+    position: relative;
+}
+
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .red-bet::after,
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .black-bet::after,
+body.purple-theme .red-bet::after,
+body.purple-theme .black-bet::after,
+body.volcanic-theme .red-bet::after,
+body.volcanic-theme .black-bet::after,
+body.frozen-theme .red-bet::after,
+body.frozen-theme .black-bet::after,
+body.royal-theme .red-bet::after,
+body.royal-theme .black-bet::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+
+    width: 24px;
+    height: 44px;
+
+    transform: translate(-50%, -50%);
+
+    clip-path: polygon(
+        50% 0%,
+        100% 50%,
+        50% 100%,
+        0% 50%
+    );
+}
+
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .red-bet::after {
+    background: #39ff14;
+    box-shadow:
+        0 0 8px #39ff14,
+        0 0 16px rgba(57,255,20,0.75);
+}
+
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) .black-bet::after {
+    background: #50dcff;
+    box-shadow:
+        0 0 8px #50dcff,
+        0 0 16px rgba(80,220,255,0.75);
+}
+
+body.purple-theme .red-bet::after {
+    background: #c86bff;
+    box-shadow:
+        0 0 8px #c86bff,
+        0 0 16px rgba(200,107,255,0.75);
+}
+
+body.purple-theme .black-bet::after {
+    background: #50dcff;
+    box-shadow:
+        0 0 8px #50dcff,
+        0 0 16px rgba(80,220,255,0.75);
+}
+
+body.volcanic-theme .red-bet::after {
+    background: #ff7a00;
+    box-shadow:
+        0 0 8px #ff7a00,
+        0 0 16px rgba(255,122,0,0.75);
+}
+
+body.volcanic-theme .black-bet::after {
+    background: #ffcf75;
+    box-shadow:
+        0 0 8px #ffcf75,
+        0 0 16px rgba(255,207,117,0.75);
+}
+
+body.frozen-theme .red-bet::after {
+    background: #8ff6ff;
+    box-shadow:
+        0 0 8px #8ff6ff,
+        0 0 16px rgba(143,246,255,0.75);
+}
+
+body.frozen-theme .black-bet::after {
+    background: #d8fbff;
+    box-shadow:
+        0 0 8px #d8fbff,
+        0 0 16px rgba(216,251,255,0.75);
+}
+
+body.royal-theme .red-bet::after {
+    background: #b00000;
+    border: 1px solid #fff0a8;
+    box-shadow: 0 0 8px rgba(176,0,0,0.55);
+}
+
+body.royal-theme .black-bet::after {
+    background: #050505;
+    border: 1px solid #ffffff;
+    box-shadow: 0 0 8px rgba(0,0,0,0.65);
+}
 
 .table-placed-chip {
     position: absolute;
@@ -1067,7 +1603,124 @@ body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-the
 	margin-top: 20px;
 }
 
+/* <------------------------------------------------
+      THEMED CHIP TOOLTIP VARIABLES
+   -------------------------------------------------> */
+:root {
+    --chip-tooltip-bg: #000000;
+    --chip-tooltip-border: #39ff14;
+    --chip-tooltip-text: #39ff14;
+}
+
+body.purple-theme {
+    --chip-tooltip-bg: #08020d;
+    --chip-tooltip-border: #c86bff;
+    --chip-tooltip-text: #dcb6ff;
+}
+
+body.volcanic-theme {
+    --chip-tooltip-bg: #100806;
+    --chip-tooltip-border: #ff7a00;
+    --chip-tooltip-text: #ffd2a1;
+}
+
+body.frozen-theme {
+    --chip-tooltip-bg: #051222;
+    --chip-tooltip-border: #8ff6ff;
+    --chip-tooltip-text: #d8fbff;
+}
+
+body.royal-theme {
+    --chip-tooltip-bg: #0b0704;
+    --chip-tooltip-border: #d4af37;
+    --chip-tooltip-text: #f5df9b;
+}
+
+body.classic-theme {
+    --chip-tooltip-bg: #075c2a;
+    --chip-tooltip-border: #ffffff;
+    --chip-tooltip-text: #ffffff;
+}
+
+body.vegas-retro-theme {
+    --chip-tooltip-bg: #1a0703;
+    --chip-tooltip-border: #ffcf6b;
+    --chip-tooltip-text: #ffe9b0;
+}
+
+/* <------------------------------------------------
+      CHIP SELECTOR CSS HOVER VALUE TOOLTIP
+   -------------------------------------------------> */
+.chip-node::after {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+
+    min-width: 54px;
+    padding: 5px 9px;
+
+    background: var(--chip-tooltip-bg, #000000);
+    border: 2px solid var(--chip-tooltip-border, #39ff14);
+    border-radius: 8px;
+
+    color: var(--chip-tooltip-text, #39ff14);
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1;
+    text-align: center;
+
+    box-shadow:
+        0 0 10px var(--chip-tooltip-border, #39ff14),
+        inset 0 0 8px rgba(255,255,255,0.12);
+
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50000;
+}
+
+.chip-node:hover::after {
+    opacity: 1;
+}
+
+.chip-node[data-value="10"]::after {
+    content: "10";
+}
+
+.chip-node[data-value="50"]::after {
+    content: "50";
+}
+
+.chip-node[data-value="100"]::after {
+    content: "100";
+}
+
+.chip-node[data-value="500"]::after {
+    content: "500";
+}
+
+.chip-node[data-value="1000"]::after {
+    content: "1K";
+}
+
+.chip-node[data-value="5000"]::after {
+    content: "5K";
+}
+
+.chip-node[data-value="10000"]::after {
+    content: "10K";
+}
+
+.chip-node[data-value="50000"]::after {
+    content: "50K";
+}
+
+.chip-node[data-value="100000"]::after {
+    content: "100K";
+}
+
 .chip-node {
+		position: relative;
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -1266,7 +1919,7 @@ body.classic-theme {
     color: #ffffff;
 }
 
-body.classic-theme * {
+body.classic-theme *:not(#spin-btn.turbo-sweep) {
     text-shadow: none !important;
     box-shadow: none !important;
     filter: none !important;
@@ -1428,21 +2081,23 @@ body.classic-theme .stat-capsule strong {
 }
 
 body.classic-theme #clear-btn,
-body.classic-theme #spin-btn {
-    background: #e6e6e6;
-    color: #000000;
-    border: 2px solid #222222;
+body.classic-theme #spin-btn:not(.turbo-sweep) {
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
     border-radius: 6px;
-    box-shadow: inset 0 1px 0 #ffffff;
-    text-shadow: none;
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
 }
 
 body.classic-theme #clear-btn:hover,
-body.classic-theme #spin-btn:hover {
-    background: #d0d0d0;
-    color: #000000;
-    border-color: #000000;
-    box-shadow: inset 0 1px 0 #ffffff;
+body.classic-theme #spin-btn:not(.turbo-sweep):hover {
+    background: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    box-shadow: none !important;
 }
 
 body.classic-theme #table-area,
@@ -1462,20 +2117,46 @@ body.classic-theme #history-title {
 
 body.classic-theme #help-btn,
 body.classic-theme #options-btn {
-    background: #e6e6e6;
-    color: #000000;
-    border: 2px solid #222222;
-    box-shadow: inset 0 1px 0 #ffffff;
-    text-shadow: none;
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
     border-radius: 50%;
 }
 
 body.classic-theme #help-btn:hover,
 body.classic-theme #options-btn:hover {
-    background: #d0d0d0;
-    color: #000000;
-    border-color: #000000;
-    box-shadow: inset 0 1px 0 #ffffff;
+    background: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+/* <------------------------------------------------
+      CLASSIC THEME WHITE WHEEL RINGS AND GOLD POINTER
+   -------------------------------------------------> */
+body.classic-theme #wheel-housing {
+    border-color: rgba(255,255,255,0.85) !important;
+    box-shadow:
+        0 0 22px rgba(255,255,255,0.45),
+        inset 0 0 18px rgba(255,255,255,0.20) !important;
+}
+
+body.classic-theme #wheel-center-logo {
+    border-color: #ffffff !important;
+    box-shadow:
+        0 0 22px rgba(255,255,255,0.45),
+        inset 0 0 18px rgba(255,255,255,0.28) !important;
+}
+
+body.classic-theme #pointer {
+    border-top-color: #ffffff !important;
+
+    filter:
+        drop-shadow(0 0 2px rgba(255,255,255,0.55))
+        drop-shadow(0 0 6px rgba(212,175,55,0.95))
+        drop-shadow(0 0 12px rgba(255,210,74,0.55)) !important;
 }
 
 body.classic-theme #ball {
@@ -1552,6 +2233,103 @@ body.classic-theme #options-close-btn:hover {
     border-color: #000000;
     transform: none;
     box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+/* <------------------------------------------------
+      CLASSIC THEME TRADITIONAL CHIPS
+   -------------------------------------------------> */
+body.classic-theme .chip-node,
+body.classic-theme .table-placed-chip {
+    background:
+        radial-gradient(circle at center,
+            #f5f5f5 0%,
+            #f5f5f5 24%,
+            #202020 25%,
+            #202020 31%,
+            transparent 32%
+        ),
+        repeating-conic-gradient(
+            from 0deg,
+            currentColor 0deg 11deg,
+            #f5f5f5 11deg 20deg
+        ) !important;
+
+    color: #111111 !important;
+    border: 2px solid #f5f5f5 !important;
+    text-shadow: none !important;
+
+    box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,0.45),
+        inset 0 0 0 7px rgba(255,255,255,0.20),
+        0 2px 5px rgba(0,0,0,0.55) !important;
+
+    filter: none !important;
+}
+
+body.classic-theme .chip-node {
+    font-size: 0.72rem;
+    font-weight: 900;
+}
+
+body.classic-theme .table-placed-chip {
+    font-size: 0.58rem;
+    font-weight: 900;
+}
+
+body.classic-theme .chip-node.selected {
+    transform: scale(1.12);
+
+    box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,0.5),
+        inset 0 0 0 7px rgba(255,255,255,0.24),
+        0 0 0 3px currentColor,
+        0 0 15px currentColor,
+        0 2px 7px rgba(0,0,0,0.65) !important;
+}
+
+body.classic-theme .chip-grey,
+body.classic-theme .chip-node[data-value="10"] {
+    color: #4a4a4a !important;
+}
+
+body.classic-theme .chip-green,
+body.classic-theme .chip-node[data-value="50"] {
+    color: #0b5c2a !important;
+}
+
+body.classic-theme .chip-blue,
+body.classic-theme .chip-node[data-value="100"] {
+    color: #123d7a !important;
+}
+
+body.classic-theme .chip-purple,
+body.classic-theme .chip-node[data-value="500"] {
+    color: #5c247a !important;
+}
+
+body.classic-theme .chip-gold,
+body.classic-theme .chip-node[data-value="1000"] {
+    color: #b8860b !important;
+}
+
+body.classic-theme .chip-pink,
+body.classic-theme .chip-node[data-value="5000"] {
+    color: #b03070 !important;
+}
+
+body.classic-theme .chip-yellow,
+body.classic-theme .chip-node[data-value="10000"] {
+    color: #c49a00 !important;
+}
+
+body.classic-theme .chip-red,
+body.classic-theme .chip-node[data-value="50000"] {
+    color: #b00000 !important;
+}
+
+body.classic-theme .chip-white,
+body.classic-theme .chip-node[data-value="100000"] {
+    color: #000000 !important;
 }
 
 #admin-modal {
@@ -1986,10 +2764,18 @@ body.classic-theme #win-number-display.classic-zero-win {
 
 /* CLASSIC THEME BET HISTORY */
 body.classic-theme #bet-history-btn {
-    background: #e6e6e6;
-    color: #000000;
-    border: 2px solid #222222;
-    box-shadow: inset 0 1px 0 #ffffff !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+body.classic-theme #bet-history-btn:hover {
+    background: rgba(255,255,255,0.12) !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    box-shadow: none !important;
 }
 
 body.classic-theme #bet-history-modal {
@@ -2909,7 +3695,7 @@ body.volcanic-theme #game-title span {
 
     -webkit-text-stroke: 2px #ffcf75 !important;
 
-    font-size: 1.55em !important;
+    font-size: 1.40em !important;
 
     letter-spacing: 6px !important;
 
@@ -3133,10 +3919,11 @@ body.frozen-theme .title-blue {
 /* FROZEN TITLE FONT + COLOR */
 body.frozen-theme #game-title {
     font-family: 'FROZBITE', Impact, fantasy;
-    font-size: 4.8rem !important;
+    font-size: 3.6rem !important;
     letter-spacing: 4px !important;
     word-spacing: 0px !important;
-    transform: scaleY(1.08);
+    transform: scale(var(--title-auto-scale, 1)) scaleY(1.08);
+    transform-origin: center center;
 
     color: #ffffff !important;
 
@@ -3478,7 +4265,7 @@ body.frozen-theme #repeat-bet-btn:hover {
 }
 
 /* FROZEN SPIN, CLEAR, AND ZERO BUTTON HOVER MATCH REPEAT */
-body.frozen-theme #spin-btn,
+body.frozen-theme #spin-btn:not(.turbo-sweep),
 body.frozen-theme #clear-btn {
     font-size: 1.35rem !important;
     font-weight: 900 !important;
@@ -3606,7 +4393,53 @@ body.frozen-theme #bet-history-btn.frozen-bet-history-hover {
 	body.frozen-theme #repeat-bet-btn {
 		font-size: 1.35rem !important;
 		font-weight: 900 !important;
-		line-height: 1 !important;
+		line-height: 1 !important;		
+}
+
+/* <------------------------------------------------
+      BUTTON TEXT SIZE AND CLASSIC TURBO EFFECT
+   -------------------------------------------------> */
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) #repeat-bet-btn,
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) #clear-btn,
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) #spin-btn,
+body.purple-theme #repeat-bet-btn,
+body.purple-theme #clear-btn,
+body.purple-theme #spin-btn,
+body.volcanic-theme #repeat-bet-btn,
+body.volcanic-theme #clear-btn,
+body.volcanic-theme #spin-btn,
+body.frozen-theme #spin-btn,
+body.classic-theme #repeat-bet-btn,
+body.classic-theme #spin-btn.turbo-sweep {
+    font-size: 1.35rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+}
+
+body.classic-theme #spin-btn.turbo-sweep {
+    animation: turboColorCycle 6s linear infinite !important;
+    background: rgba(80,220,255,0.08) !important;
+    border: 2px solid currentColor !important;
+    color: #39ff14;
+    box-shadow:
+        0 0 10px currentColor,
+        0 0 20px currentColor,
+        inset 0 0 8px rgba(255,255,255,0.18) !important;
+    text-shadow: 0 0 6px currentColor !important;
+}
+
+body.classic-theme #spin-btn.turbo-sweep:hover {
+    animation: turboColorCycle 6s linear infinite !important;
+    background: rgba(80,220,255,0.18) !important;
+    border: 2px solid currentColor !important;
+    color: #39ff14;
+    box-shadow:
+        0 0 18px currentColor,
+        0 0 32px currentColor,
+        inset 0 0 12px rgba(255,255,255,0.28) !important;
+    text-shadow:
+        0 0 8px currentColor,
+        0 0 16px currentColor !important;
 }
 
 /* FROZEN POINTER BRIGHTNESS */
@@ -3740,9 +4573,6 @@ body.royal-theme {
 }
 
 /* ROYAL PANEL LAYOUT POSITION */
-body.royal-theme #cyber-dashboard {
-    transform: translateY(-45px);
-}
 
 body.royal-theme #panel-history,
 body.royal-theme #panel-left,
@@ -3797,7 +4627,8 @@ body.royal-theme #game-title {
     font-weight: 400;
     line-height: 1;
     letter-spacing: 0;
-    transform: scaleX(0.82);
+    transform: scale(var(--title-auto-scale, 1)) scaleX(0.82);
+    transform-origin: center center;
 	text-transform: none !important;
 	overflow: visible !important;
 	padding: 18px 40px 12px 40px;
@@ -4987,22 +5818,29 @@ body.vegas-retro-theme .chip-node,
 body.vegas-retro-theme .table-placed-chip {
     background:
         radial-gradient(circle at center,
-            #fff3d0 0%,
-            #fff3d0 24%,
-            transparent 25%
+            #061e21 0%,
+            #061e21 24%,
+            #ffcf6b 25%,
+            #ffcf6b 32%,
+            transparent 33%
         ),
         repeating-conic-gradient(
             from 0deg,
-            currentColor 0deg 12deg,
-            #f4ead0 12deg 20deg
-        );
+            #b87922 0deg 12deg,
+            #1a0703 12deg 20deg
+        ) !important;
+
     border-style: solid;
-    border-color: #f4ead0;
-    color: #8d160d;
-    text-shadow: none;
+    border-color: #ffcf6b !important;
+    color: #ffffff !important;
+    text-shadow:
+        0 1px 2px #000000,
+        0 0 5px rgba(255,207,107,0.65) !important;
+
     box-shadow:
-        inset 0 0 0 3px rgba(0,0,0,0.3),
-        0 2px 8px rgba(0,0,0,0.65);
+        inset 0 0 0 3px rgba(0,0,0,0.45),
+        inset 0 0 0 7px rgba(255,207,107,0.14),
+        0 2px 8px rgba(0,0,0,0.65) !important;
 }
 
 body.vegas-retro-theme #spin-btn {
@@ -5427,4 +6265,267 @@ body.vegas-retro-theme #wheel-inner-ring {
     box-shadow:
         inset 0 0 18px rgba(255,179,49,0.25),
         0 0 14px rgba(255,147,28,0.35);
+}
+
+/* <------------------------------------------------
+      RESPONSIVE THEME BACKGROUND IMAGE BLEND SYSTEM
+   -------------------------------------------------> */
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme)::before,
+body.purple-theme::before,
+body.volcanic-theme::before,
+body.frozen-theme::before,
+body.royal-theme::before,
+body.vegas-retro-theme::before {
+    width: 100vw !important;
+    height: clamp(260px, 58vh, 620px) !important;
+    background-size: 100% 100%, 100% 100% !important;
+    background-position: center top, center top !important;
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,0.72) 74%,
+        rgba(0,0,0,0.28) 90%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,0.72) 74%,
+        rgba(0,0,0,0.28) 90%,
+        transparent 100%
+    );
+}
+
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme)::after,
+body.purple-theme::after,
+body.volcanic-theme::after,
+body.frozen-theme::after,
+body.royal-theme::after,
+body.vegas-retro-theme::after {
+    width: 100vw !important;
+    height: clamp(260px, 58vh, 620px) !important;
+    background-size: 100% 100%, 100% 100% !important;
+    background-position: center bottom, center bottom !important;
+
+    -webkit-mask-image: linear-gradient(
+        to top,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,0.72) 74%,
+        rgba(0,0,0,0.28) 90%,
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to top,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,0.72) 74%,
+        rgba(0,0,0,0.28) 90%,
+        transparent 100%
+    );
+}
+
+/* <------------------------------------------------
+      LARGE CENTER CHIP DESIGN FOR CLASSIC ROYAL RETRO
+   -------------------------------------------------> */
+body.classic-theme .chip-node,
+body.royal-theme .chip-node,
+body.vegas-retro-theme .chip-node {
+    background:
+        radial-gradient(circle at center,
+            #f8f1d6 0%,
+            #f8f1d6 43%,
+            #111111 44%,
+            #111111 49%,
+            transparent 50%
+        ),
+        repeating-conic-gradient(
+            from 0deg,
+            currentColor 0deg 10deg,
+            #f8f1d6 10deg 18deg
+        ) !important;
+
+    color: #111111 !important;
+    text-shadow: none !important;
+    font-weight: 900 !important;
+}
+
+body.classic-theme .chip-node,
+body.royal-theme .chip-node,
+body.vegas-retro-theme .chip-node {
+    font-size: 0.9rem !important;
+    letter-spacing: -0.5px;
+}
+
+body.classic-theme .chip-node[data-value="100000"],
+body.royal-theme .chip-node[data-value="100000"],
+body.vegas-retro-theme .chip-node[data-value="100000"] {
+    font-size: 0.58rem !important;
+}
+
+/* <------------------------------------------------
+      CLASSIC ROYAL RETRO BET GRID CHIP DESIGN
+   -------------------------------------------------> */
+body.classic-theme .table-placed-chip,
+body.royal-theme .table-placed-chip,
+body.vegas-retro-theme .table-placed-chip {
+    background: #000000 !important;
+    border: 2px solid #ffffff !important;
+    font-size: 0.65rem !important;
+    font-weight: 900 !important;
+    letter-spacing: -0.5px;
+    text-shadow: none !important;
+    box-shadow: 0 0 8px rgba(255,255,255,0.7) !important;
+}
+
+body.classic-theme .table-placed-chip.chip-grey,
+body.royal-theme .table-placed-chip.chip-grey,
+body.vegas-retro-theme .table-placed-chip.chip-grey {
+    color: #b8b8b8 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-green,
+body.royal-theme .table-placed-chip.chip-green,
+body.vegas-retro-theme .table-placed-chip.chip-green {
+    color: #39ff14 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-blue,
+body.royal-theme .table-placed-chip.chip-blue,
+body.vegas-retro-theme .table-placed-chip.chip-blue {
+    color: #50dcff !important;
+}
+
+body.classic-theme .table-placed-chip.chip-purple,
+body.royal-theme .table-placed-chip.chip-purple,
+body.vegas-retro-theme .table-placed-chip.chip-purple {
+    color: #b56cff !important;
+}
+
+body.classic-theme .table-placed-chip.chip-gold,
+body.royal-theme .table-placed-chip.chip-gold,
+body.vegas-retro-theme .table-placed-chip.chip-gold {
+    color: #ffd700 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-pink,
+body.royal-theme .table-placed-chip.chip-pink,
+body.vegas-retro-theme .table-placed-chip.chip-pink {
+    color: #ff46b4 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-yellow,
+body.royal-theme .table-placed-chip.chip-yellow,
+body.vegas-retro-theme .table-placed-chip.chip-yellow {
+    color: #ffff00 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-red,
+body.royal-theme .table-placed-chip.chip-red,
+body.vegas-retro-theme .table-placed-chip.chip-red {
+    color: #ff4444 !important;
+}
+
+body.classic-theme .table-placed-chip.chip-white,
+body.royal-theme .table-placed-chip.chip-white,
+body.vegas-retro-theme .table-placed-chip.chip-white {
+    color: #ffffff !important;
+    font-size: 0.58rem !important;
+}
+
+/* <------------------------------------------------
+      GLOBAL CHAT AND LEADERBOARD PANEL TRANSPARENCY
+   -------------------------------------------------> */
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) #panel-chat,
+body:not(.purple-theme):not(.classic-theme):not(.volcanic-theme):not(.frozen-theme):not(.royal-theme):not(.vegas-retro-theme) #panel-leaderboard,
+body.purple-theme #panel-chat,
+body.purple-theme #panel-leaderboard,
+body.volcanic-theme #panel-chat,
+body.volcanic-theme #panel-leaderboard,
+body.frozen-theme #panel-chat,
+body.frozen-theme #panel-leaderboard,
+body.royal-theme #panel-chat,
+body.royal-theme #panel-leaderboard,
+body.vegas-retro-theme #panel-chat,
+body.vegas-retro-theme #panel-leaderboard {
+    background: inherit !important;
+    backdrop-filter: blur(3px);
+}
+
+/* <------------------------------------------------
+      CLASSIC AND RETRO ROYAL MATCHING CHIP SELECTOR BORDERS
+   -------------------------------------------------> */
+body.classic-theme .chip-node[data-value="10"],
+body.vegas-retro-theme .chip-node[data-value="10"] {
+    --selected-chip-border: #cfcfcf;
+}
+
+body.classic-theme .chip-node[data-value="50"],
+body.vegas-retro-theme .chip-node[data-value="50"] {
+    --selected-chip-border: #3fbf68;
+}
+
+body.classic-theme .chip-node[data-value="100"],
+body.vegas-retro-theme .chip-node[data-value="100"] {
+    --selected-chip-border: #4fa7d8;
+}
+
+body.classic-theme .chip-node[data-value="500"],
+body.vegas-retro-theme .chip-node[data-value="500"] {
+    --selected-chip-border: #9b65d8;
+}
+
+body.classic-theme .chip-node[data-value="1000"],
+body.vegas-retro-theme .chip-node[data-value="1000"] {
+    --selected-chip-border: #d4af37;
+}
+
+body.classic-theme .chip-node[data-value="5000"],
+body.vegas-retro-theme .chip-node[data-value="5000"] {
+    --selected-chip-border: #d86fa8;
+}
+
+body.classic-theme .chip-node[data-value="10000"],
+body.vegas-retro-theme .chip-node[data-value="10000"] {
+    --selected-chip-border: #f5df4d;
+}
+
+body.classic-theme .chip-node[data-value="50000"],
+body.vegas-retro-theme .chip-node[data-value="50000"] {
+    --selected-chip-border: #c74a3a;
+}
+
+body.classic-theme .chip-node[data-value="100000"],
+body.vegas-retro-theme .chip-node[data-value="100000"] {
+    --selected-chip-border: #ffffff;
+}
+
+body.classic-theme .chip-node.selected,
+body.vegas-retro-theme .chip-node.selected {
+    border-color: var(--selected-chip-border) !important;
+
+    box-shadow:
+        inset 0 0 0 3px rgba(0,0,0,0.38),
+        inset 0 0 0 7px rgba(255,255,255,0.22),
+        0 0 10px var(--selected-chip-border),
+        0 2px 8px rgba(0,0,0,0.6) !important;
+}
+
+body.classic-theme .chip-node.selected[data-value="100000"],
+body.vegas-retro-theme .chip-node.selected[data-value="100000"] {
+    border-color: #ffffff !important;
+}
+
+body.classic-theme .chip-node.selected[data-value="100000"]::before,
+body.vegas-retro-theme .chip-node.selected[data-value="100000"]::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border: 3px solid #39ff14;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: turboColorCycle 6s linear infinite;
 }

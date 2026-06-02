@@ -21,6 +21,12 @@ let betHistory = [];
 let lifetimeSpinCount = 0;
 let lifetimeNetTotal = 0;
 
+/* <------------------------------------------------
+      SINGLE SPIN LEADERBOARD DATA
+   -------------------------------------------------> */
+let singleSpinLeaderboard = [];
+const DEFAULT_PLAYER_NAME = 'Player';
+
 let turboSpinMode = false;
 
 let infiniteBankMode = false;
@@ -38,6 +44,14 @@ let ballStage = 'idle';
 
 let winningIndex = 0;
 let targetDockOffset = 0;
+
+/* <------------------------------------------------
+      GLOBAL GAME AUTO SCALE SETTINGS
+   -------------------------------------------------> */
+const GAME_BASE_WIDTH = 1660;
+const GAME_BASE_HEIGHT = 900;
+const GAME_SCALE_PADDING = 24;
+let currentGameScale = 1;
 
 // IMAGE PATH CONSTANTS
 const IMAGE_PATH = 'image/';
@@ -87,6 +101,12 @@ const adminResetBankBtn = document.getElementById('admin-reset-bank');
 const infiniteBankBtn = document.getElementById('infinite-bank-btn');
 const unlockCosmeticsBtn = document.getElementById('unlock-cosmetics-btn');
 const adminClearHistoryBtn = document.getElementById('admin-clear-history-btn');
+
+/* <------------------------------------------------ 
+		ADMIN CHAT AND LEADERBOARD CONSTANTS -------------------------------------------------> */
+const adminClearChatBtn = document.getElementById('admin-clear-chat-btn');
+const adminClearLeaderboardBtn = document.getElementById('admin-clear-leaderboard-btn');
+
 const clearHistoryConfirmModal = document.getElementById('clear-history-confirm-modal');
 const confirmClearHistoryBtn = document.getElementById('confirm-clear-history-btn');
 const cancelClearHistoryBtn = document.getElementById('cancel-clear-history-btn');
@@ -108,6 +128,15 @@ const versionDisplay = document.getElementById('version-display');
 //BET LABEL CONSTANTS
 const redBetLabel = document.querySelector('.red-bet');
 const blackBetLabel = document.querySelector('.black-bet');
+
+/* <------------------------------------------------ 
+		CHAT AND LEADERBOARD CONSTANTS -------------------------------------------------> */
+const chatUsersToggleBtn = document.getElementById('chat-users-toggle-btn');
+const chatUserSlideout = document.getElementById('chat-user-slideout');
+const chatUserButtons = document.querySelectorAll('.chat-user-btn');
+const leaderboardList = document.getElementById('leaderboard-list');
+const gameDashboard = document.getElementById('cyber-dashboard');
+const gameTitleElement = document.getElementById('game-title');
 
 // DEFAULT THEME HANDLES
 const DEFAULT_THEME_HANDLES = {
@@ -199,6 +228,153 @@ function applyThemeOptionLocks(themeName) {
 
 // DISPLAY GAME VERSION
 versionDisplay.textContent = `Ver: ${GAME_VERSION}`;
+
+/* <------------------------------------------------
+      GLOBAL GAME AUTO SCALE SYSTEM
+   -------------------------------------------------> */
+function autoScaleGameToWindow() {
+    if (!gameDashboard) return;
+
+    const availableWidth = window.innerWidth - GAME_SCALE_PADDING;
+    const availableHeight = window.innerHeight - GAME_SCALE_PADDING;
+
+    const widthScale = availableWidth / GAME_BASE_WIDTH;
+    const heightScale = availableHeight / GAME_BASE_HEIGHT;
+
+    const finalScale = Math.min(widthScale, heightScale, 1);
+
+    currentGameScale = finalScale;
+
+    gameDashboard.style.transform = `scale(${finalScale})`;
+
+/* <------------------------------------------------
+			TITLE AUTO FIT SCALE SYSTEM
+	 -------------------------------------------------> */
+    gameTitleElement.style.setProperty('--title-auto-scale', 1);
+
+    const titleAvailableWidth =
+        Math.max(window.innerWidth - GAME_SCALE_PADDING, 320);
+
+    const titleNaturalWidth =
+        gameTitleElement.scrollWidth;
+
+    const titleScale =
+        titleNaturalWidth > titleAvailableWidth
+            ? Math.max(titleAvailableWidth / titleNaturalWidth, 0.45)
+            : 1;
+
+    gameTitleElement.style.setProperty(
+        '--title-auto-scale',
+        titleScale
+    );
+		
+    gameDashboard.style.transformOrigin = 'top center';
+
+    gameDashboard.style.width = `${GAME_BASE_WIDTH}px`;
+    gameDashboard.style.maxWidth = 'none';
+    gameDashboard.style.marginLeft = '0';
+    gameDashboard.style.marginRight = '0';
+
+/* <------------------------------------------------
+			SCALE AWARE THEME LAYOUT OFFSETS
+	 -------------------------------------------------> */
+    const themePanelOffsets = {
+        'cyber-green': -35,
+        'cyber-purple': -35,
+        'volcanic': -35,
+        'frozen': -35,
+        'royal': -95,
+        'classic': -35,
+        'vegas-retro': -20
+    };
+
+    gameDashboard.style.marginTop =
+        `${themePanelOffsets[currentTheme] * finalScale}px`;
+
+    document.body.style.alignItems = 'center';
+    document.body.style.justifyContent =
+        finalScale < 1 ? 'flex-start' : 'center';
+	}	
+
+/* <------------------------------------------------ 
+		CHAT PANEL PLACEHOLDER FUNCTIONS -------------------------------------------------> */
+if (chatUsersToggleBtn && chatUserSlideout) {
+    chatUsersToggleBtn.addEventListener('click', () => {
+        chatUserSlideout.classList.toggle('chat-slideout-hidden');
+    });
+}
+
+chatUserButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const playerName = button.dataset.playerName || 'Player';
+
+        systemLog.textContent =
+            `Send chips system coming later for ${playerName}.`;
+    });
+});
+
+/* <------------------------------------------------
+      SINGLE SPIN LEADERBOARD SYSTEM
+   -------------------------------------------------> */
+function saveSingleSpinLeaderboard() {
+    localStorage.setItem(
+        'ultimateRoulette_singleSpinLeaderboard',
+        JSON.stringify(singleSpinLeaderboard)
+    );
+}
+
+function loadSingleSpinLeaderboard() {
+    const savedLeaderboard = localStorage.getItem(
+        'ultimateRoulette_singleSpinLeaderboard'
+    );
+
+    if (savedLeaderboard) {
+        singleSpinLeaderboard = JSON.parse(savedLeaderboard);
+    }
+}
+
+function renderSingleSpinLeaderboard() {
+    if (!leaderboardList) return;
+
+    const leaderboardRows =
+        singleSpinLeaderboard.length > 0
+            ? singleSpinLeaderboard
+            : [
+                { playerName: '---', winAmount: 0 },
+                { playerName: '---', winAmount: 0 },
+                { playerName: '---', winAmount: 0 },
+                { playerName: '---', winAmount: 0 },
+                { playerName: '---', winAmount: 0 }
+            ];
+
+    leaderboardList.innerHTML = leaderboardRows.slice(0, 5).map((entry, index) => {
+        return `
+            <div class="leaderboard-row">
+                <span>${index + 1}.</span>
+                <span>${entry.playerName}</span>
+                <span>${entry.winAmount}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function addSingleSpinLeaderboardEntry(winAmount) {
+    if (winAmount <= 0) return;
+
+    singleSpinLeaderboard.push({
+        playerName: DEFAULT_PLAYER_NAME,
+        winAmount
+    });
+
+    singleSpinLeaderboard.sort((a, b) => b.winAmount - a.winAmount);
+    singleSpinLeaderboard = singleSpinLeaderboard.slice(0, 5);
+
+    saveSingleSpinLeaderboard();
+    renderSingleSpinLeaderboard();
+}
+
+loadSingleSpinLeaderboard();
+renderSingleSpinLeaderboard();
 
 //START FUNCTIONS
 
@@ -504,6 +680,8 @@ themeToggleBtn.addEventListener('click', () => {
     }
 
     drawRouletteWheel();
+		refreshWinningNumberDisplayTheme();
+		autoScaleGameToWindow();
 	
 	applyDefaultThemeHandle(currentTheme);
 	applyThemeOptionLocks(currentTheme);
@@ -646,6 +824,34 @@ adminClearHistoryBtn.addEventListener('click', () => {
     clearHistoryConfirmModal.classList.remove('modal-hidden');
 });
 
+/* <------------------------------------------------ 
+		ADMIN CHAT AND LEADERBOARD CLEAR CONTROLS -------------------------------------------------> */
+if (adminClearChatBtn) {
+    adminClearChatBtn.addEventListener('click', () => {
+        const chatMessages = document.getElementById('chat-messages');
+
+        if (!chatMessages) return;
+
+        chatMessages.innerHTML = `
+            <div class="chat-placeholder-message">
+                Chat history cleared.
+            </div>
+        `;
+
+        adminStatus.textContent = 'Chat history cleared.';
+    });
+}
+
+if (adminClearLeaderboardBtn) {
+    adminClearLeaderboardBtn.addEventListener('click', () => {
+        singleSpinLeaderboard = [];
+        saveSingleSpinLeaderboard();
+        renderSingleSpinLeaderboard();
+
+        adminStatus.textContent = 'Leaderboard cleared.';
+    });
+}
+
 confirmClearHistoryBtn.addEventListener('click', () => {
 
     betHistory = [];
@@ -678,6 +884,19 @@ function getBetPayoutMultiplier(type) {
         case 'column': return 3;
         default: return 0;
     }
+}
+
+/* <------------------------------------------------
+      CHIP VALUE DISPLAY FORMATTER
+   -------------------------------------------------> */
+function formatChipDisplayValue(value) {
+    const numericValue = parseInt(value);
+
+    if (numericValue >= 1000) {
+        return `${numericValue / 1000}K`;
+    }
+
+    return `${numericValue}`;
 }
 
 function getBetLabel(bet) {
@@ -730,6 +949,98 @@ function getNumberColorClass(number) {
     if (number === 0) return 'history-zero';
     if (redNumbers.includes(number)) return 'history-red';
     return 'history-black';
+}
+
+/* <------------------------------------------------
+      THEME WINNING NUMBER DISPLAY REFRESH
+   -------------------------------------------------> */
+function refreshWinningNumberDisplayTheme() {
+    const displayedNumber = parseInt(winNumberDisplay.textContent);
+
+    if (Number.isNaN(displayedNumber)) return;
+
+    winNumberDisplay.classList.remove(
+        'vegas-red-win',
+        'vegas-black-win',
+        'vegas-zero-win',
+        'classic-red-win',
+        'classic-black-win',
+        'classic-zero-win',
+        'frozen-zero-win'
+    );
+
+    winNumberDisplay.style.color = '';
+    winNumberDisplay.style.textShadow = '';
+
+    if (document.body.classList.contains('classic-theme')) {
+        if (displayedNumber === 0) {
+            winNumberDisplay.classList.add('classic-zero-win');
+        } else if (redNumbers.includes(displayedNumber)) {
+            winNumberDisplay.classList.add('classic-red-win');
+        } else {
+            winNumberDisplay.classList.add('classic-black-win');
+        }
+
+        return;
+    }
+
+    if (document.body.classList.contains('vegas-retro-theme')) {
+        if (displayedNumber === 0) {
+            winNumberDisplay.classList.add('vegas-zero-win');
+        } else if (redNumbers.includes(displayedNumber)) {
+            winNumberDisplay.classList.add('vegas-red-win');
+        } else {
+            winNumberDisplay.classList.add('vegas-black-win');
+        }
+
+        return;
+    }
+
+    if (document.body.classList.contains('frozen-theme') && displayedNumber === 0) {
+        winNumberDisplay.classList.add('frozen-zero-win');
+        return;
+    }
+
+    if (displayedNumber === 0) {
+        winNumberDisplay.style.color = '#ffd700';
+        winNumberDisplay.style.textShadow = '0 0 8px #ffd700';
+        return;
+    }
+
+    if (redNumbers.includes(displayedNumber)) {
+        if (document.body.classList.contains('volcanic-theme')) {
+            winNumberDisplay.style.color = '#ff7a00';
+            winNumberDisplay.style.textShadow = '0 0 8px #ff7a00';
+        } else if (document.body.classList.contains('purple-theme')) {
+            winNumberDisplay.style.color = '#c86bff';
+            winNumberDisplay.style.textShadow = '0 0 8px #c86bff';
+        } else if (document.body.classList.contains('frozen-theme')) {
+            winNumberDisplay.style.color = '#8ff6ff';
+            winNumberDisplay.style.textShadow = '0 0 8px #8ff6ff';
+        } else if (document.body.classList.contains('royal-theme')) {
+            winNumberDisplay.style.color = '#d4af37';
+            winNumberDisplay.style.textShadow = '0 0 6px rgba(212,175,55,0.65)';
+        } else {
+            winNumberDisplay.style.color = '#39ff14';
+            winNumberDisplay.style.textShadow = '0 0 8px #39ff14';
+        }
+
+        return;
+    }
+
+    if (document.body.classList.contains('frozen-theme')) {
+        winNumberDisplay.style.color = '#d8fbff';
+        winNumberDisplay.style.textShadow = '0 0 8px #d8fbff';
+    } else if (document.body.classList.contains('royal-theme')) {
+        winNumberDisplay.style.color = '#f5df9b';
+        winNumberDisplay.style.textShadow = 'none';
+    } else if (document.body.classList.contains('volcanic-theme')) {
+        winNumberDisplay.style.color = '#ffcf75';
+        winNumberDisplay.style.textShadow = '0 0 8px #ffcf75';
+    } else {
+        winNumberDisplay.style.color = '#50dcff';
+        winNumberDisplay.style.textShadow = '0 0 8px #50dcff';
+    }
 }
 
 function updateSpinHistory(winningNumber) {
@@ -901,17 +1212,19 @@ function drawRouletteWheel() {
         ctx.closePath();
         ctx.fill();
 
-        ctx.strokeStyle = isRoyalTheme
-			? 'rgba(184,138,43,0.42)'
-			: isFrozenTheme
-				? 'rgba(143,246,255,0.42)'
-				: isVolcanicTheme
-					? 'rgba(255,122,0,0.42)'
-					: isPurpleTheme
-						? 'rgba(200,107,255,0.35)'
-						: isVegasRetroTheme
-							? 'rgba(184,121,34,0.62)'
-							: 'rgba(57,255,20,0.3)';
+    ctx.strokeStyle = isClassicTheme
+        ? 'rgba(255,255,255,0.85)'
+        : isRoyalTheme
+            ? 'rgba(184,138,43,0.72)'
+            : isFrozenTheme
+                ? 'rgba(143,246,255,0.75)'
+                : isVolcanicTheme
+                    ? 'rgba(255,122,0,0.75)'
+                    : isPurpleTheme
+                        ? 'rgba(200,107,255,0.6)'
+                        : isVegasRetroTheme
+                            ? 'rgba(184,121,34,0.82)'
+                            : 'rgba(57,255,20,0.5)';
 
         ctx.lineWidth = 1.5;
         ctx.stroke();
@@ -942,17 +1255,19 @@ function drawRouletteWheel() {
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius - 48, 0, Math.PI * 2);
 
-    ctx.strokeStyle = isRoyalTheme
-		? 'rgba(184,138,43,0.72)'
-		: isFrozenTheme
-			? 'rgba(143,246,255,0.75)'
-			: isVolcanicTheme
-				? 'rgba(255,122,0,0.75)'
-				: isPurpleTheme
-					? 'rgba(200,107,255,0.6)'
-					: isVegasRetroTheme
-						? 'rgba(184,121,34,0.82)'
-						: 'rgba(57,255,20,0.5)';
+        ctx.strokeStyle = isClassicTheme
+            ? 'rgba(255,255,255,0.55)'
+            : isRoyalTheme
+                ? 'rgba(184,138,43,0.42)'
+                : isFrozenTheme
+                    ? 'rgba(143,246,255,0.42)'
+                    : isVolcanicTheme
+                        ? 'rgba(255,122,0,0.42)'
+                        : isPurpleTheme
+                            ? 'rgba(200,107,255,0.35)'
+                            : isVegasRetroTheme
+                                ? 'rgba(184,121,34,0.62)'
+                                : 'rgba(57,255,20,0.3)';
 
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -987,7 +1302,7 @@ function buildVerticalTable() {
 
 buildVerticalTable();
 
-const THRESHOLD = 11;
+const BASE_BET_DETECTION_THRESHOLD = 11;
 let currentTargetBet = null;
 
 // VEGAS RETRO FORCED BET GRID HOVER HIGHLIGHT
@@ -1039,8 +1354,8 @@ if (cell.classList.contains('outside') || cell.dataset.betType === 'column' || c
     currentTargetBet = {
         type,
         values: type === 'number' ? [0] : [val],
-        posX: rect.left + rect.width / 2 - tableRect.left,
-        posY: rect.top + rect.height / 2 - tableRect.top,
+        posX: (rect.left + rect.width / 2 - tableRect.left) / currentGameScale,
+        posY: (rect.top + rect.height / 2 - tableRect.top) / currentGameScale,
         id: `${type}-${val}`
     };
 
@@ -1095,11 +1410,13 @@ if (cell.classList.contains('outside') || cell.dataset.betType === 'column' || c
 
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
+    const scaledBetDetectionThreshold =
+        BASE_BET_DETECTION_THRESHOLD * currentGameScale;
 
-    const nearLeft = mouseX < THRESHOLD && c > 3;
-    const nearRight = mouseX > rect.width - THRESHOLD && c < 5;
-    const nearTop = mouseY < THRESHOLD && r > 2;
-    const nearBottom = mouseY > rect.height - THRESHOLD && r < 13;
+    const nearLeft = mouseX < scaledBetDetectionThreshold && c > 3;
+    const nearRight = mouseX > rect.width - scaledBetDetectionThreshold && c < 5;
+    const nearTop = mouseY < scaledBetDetectionThreshold && r > 2;
+    const nearBottom = mouseY > rect.height - scaledBetDetectionThreshold && r < 13;
 
     let highlightedRows = [r];
     let highlightedCols = [c];
@@ -1159,11 +1476,11 @@ if (cell.classList.contains('outside') || cell.dataset.betType === 'column' || c
         if (nearBottom) chipY = rect.bottom;
     }
 
-        currentTargetBet = {
+    currentTargetBet = {
         type: betType,
         values: finalTargetValues,
-        posX: chipX - tableRect.left,
-        posY: chipY - tableRect.top,
+        posX: (chipX - tableRect.left) / currentGameScale,
+        posY: (chipY - tableRect.top) / currentGameScale,
         id: `${betType}-${finalTargetValues.sort((a,b) => a-b).join('_')}`
     };
 
@@ -1225,7 +1542,7 @@ function repeatLastBets() {
 
         chipVisual.className = `table-placed-chip ${chipClass}`;
         chipVisual.id = `visual-${bet.id}`;
-        chipVisual.textContent = bet.amount;
+        chipVisual.textContent = formatChipDisplayValue(bet.amount);
 
 		chipVisual.style.left = `${bet.posX}px`;
 		chipVisual.style.top = `${bet.posY}px`;
@@ -1262,7 +1579,8 @@ if (!infiniteBankMode) {
 
     if (existingBet) {
         existingBet.amount += selectedChipValue;
-        document.getElementById(`visual-${currentTargetBet.id}`).textContent = existingBet.amount;
+        document.getElementById(`visual-${currentTargetBet.id}`).textContent =
+            formatChipDisplayValue(existingBet.amount);
     } else {
         activeBets.push({
 			id: currentTargetBet.id,
@@ -1288,7 +1606,7 @@ if (!infiniteBankMode) {
 
 chipVisual.className = `table-placed-chip ${chipClass}`;
         chipVisual.id = `visual-${currentTargetBet.id}`;
-        chipVisual.textContent = selectedChipValue;
+        chipVisual.textContent = formatChipDisplayValue(selectedChipValue);
         chipVisual.style.left = `${currentTargetBet.posX}px`;
         chipVisual.style.top = `${currentTargetBet.posY}px`;
         table.appendChild(chipVisual);
@@ -1431,6 +1749,7 @@ function loadSavedSettings() {
         turboToggleBtn.classList.add('option-on');
 
         spinBtn.textContent = 'TURBO';
+        spinBtn.classList.add('turbo-sweep');
 
     }
 	
@@ -1540,7 +1859,7 @@ if (savedTheme === 'classic') {
 
     setVegasRetroTitleMarkup();
 
-    themeToggleBtn.textContent = 'VEGAS';
+    themeToggleBtn.textContent = 'VEGAS RETRO';
     themeToggleBtn.style.color = '#ffcf6b';
     themeToggleBtn.style.borderColor = '#ff3b22';
 
@@ -1561,10 +1880,13 @@ if (savedTheme === 'classic') {
     themeToggleBtn.style.borderColor = '#39ff14';
 
     drawRouletteWheel();
-	
+
+}
+
+	refreshWinningNumberDisplayTheme();
+
 	applyDefaultThemeHandle(currentTheme);
 	applyThemeOptionLocks(currentTheme);
-}
 
 }
 
@@ -1829,8 +2151,8 @@ if (document.body.classList.contains('classic-theme')) {
 }
 
     updateSpinHistory(winningNumber);
-
-	addBetHistoryEntry(resolvedTotalBet, netPayout);
+    addSingleSpinLeaderboardEntry(netPayout);
+		addBetHistoryEntry(resolvedTotalBet, netPayout);
 
 if (netPayout > 0) {
 
@@ -1866,6 +2188,24 @@ if (netPayout > 0) {
     }
 }
 
+/* <------------------------------------------------
+      CHIP SELECTOR HOVER VALUE TOOLTIP
+   -------------------------------------------------> */
+function getChipTooltipLabel(value) {
+    if (value >= 1000) {
+        return `${value / 1000}K`;
+    }
+
+    return `${value}`;
+}
+
+/* <------------------------------------------------
+      CHIP SELECTOR DISPLAY VALUE FORMATTER
+   -------------------------------------------------> */
+document.querySelectorAll('.chip-node').forEach(chip => {
+    chip.textContent = formatChipDisplayValue(chip.dataset.value);
+});
+
 document.querySelectorAll('.chip-node').forEach(chip => {
     chip.addEventListener('click', () => {
         if (table.classList.contains('disabled-table')) return;
@@ -1879,3 +2219,8 @@ document.querySelectorAll('.chip-node').forEach(chip => {
 loadSavedSettings();
 loadSavedSpinHistory();
 loadSavedBetHistory();
+
+autoScaleGameToWindow();
+
+window.addEventListener('resize', autoScaleGameToWindow);
+window.addEventListener('orientationchange', autoScaleGameToWindow);
